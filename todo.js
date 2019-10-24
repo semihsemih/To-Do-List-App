@@ -11,7 +11,28 @@ eventListeners()
 
 function eventListeners() {
   form.addEventListener('submit', addTodo);
-  document.addEventListener('DOMContentLoaded', loadAllTodosToUI)
+  document.addEventListener('DOMContentLoaded', loadAllTodosToUI);
+  secondCardBody.addEventListener('click', deleteTodo);
+}
+
+function deleteTodo(event) {
+  if (event.target.className === 'fa fa-remove') {
+    event.target.parentElement.parentElement.remove();
+    deleteTodoFromStorage(event.target.parentElement.parentElement.textContent);
+    showAlert('success', 'Todo deleted succesfully')
+  }
+}
+
+function deleteTodoFromStorage(deletetodo) {
+  let todos = getTodosFromStorage();
+
+  todos.forEach(function (todo, index) {
+    if (todo === deletetodo) {
+      todos.splice(index, 1);
+    }
+  })
+
+  localStorage.setItem('todos', JSON.stringify(todos))
 }
 
 function loadAllTodosToUI() {
