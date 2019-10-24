@@ -6,13 +6,29 @@ const secondCardBody = document.querySelectorAll('.card-body')[1]
 const filter = document.querySelector('#filter')
 const clearButton = document.querySelector('#clear-todos')
 
-eventListeners()
+eventListeners();
 
 
 function eventListeners() {
   form.addEventListener('submit', addTodo);
   document.addEventListener('DOMContentLoaded', loadAllTodosToUI);
   secondCardBody.addEventListener('click', deleteTodo);
+  filter.addEventListener('keyup', filterTodos);
+}
+
+function filterTodos(event) {
+  const filterValue = event.target.value.toLowerCase();
+  const listItems = document.querySelectorAll('.list-group-item');
+  
+  listItems.forEach(function (listItem) {
+    const text = listItem.textContent.toLowerCase();
+    if (text.indexOf(filterValue) === -1) {
+      // Not Found
+      listItem.setAttribute('style', 'display : none !important');
+    } else {
+      listItem.setAttribute('style', 'display : block');
+    }
+  })
 }
 
 function deleteTodo(event) {
