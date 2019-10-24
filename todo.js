@@ -15,8 +15,27 @@ function eventListeners() {
 
 function addTodo(event) {
     const newTodo = todoInput.value.trim();
-    addTodoToUI(newTodo)
+
+    if (newTodo === '') {
+        showAlert("danger", "Please enter a todo...")
+    } else {
+        addTodoToUI(newTodo)
+        showAlert('success', 'Todo successfully added')
+    }
+    
     event.preventDefault();
+}
+
+function showAlert(type, message) {
+    const alert = document.createElement('div')
+    alert.className = `alert alert-${type}`
+    alert.textContent = message
+
+    firstCardBody.appendChild(alert)
+
+    setTimeout(function () {
+        alert.remove()
+    }, 1500)
 }
 
 function addTodoToUI(newTodo) {
