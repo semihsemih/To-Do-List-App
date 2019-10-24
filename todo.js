@@ -14,6 +14,16 @@ function eventListeners() {
   document.addEventListener('DOMContentLoaded', loadAllTodosToUI);
   secondCardBody.addEventListener('click', deleteTodo);
   filter.addEventListener('keyup', filterTodos);
+  clearButton.addEventListener('click', clearAllTodos)
+}
+
+function clearAllTodos() {
+  if (confirm('Tümünü silmek istediğinize emin misiniz?')) {
+    while (todoList.firstElementChild != null) {
+      todoList.removeChild(todoList.firstElementChild);
+    }
+    localStorage.removeItem('todos');
+  }
 }
 
 function filterTodos(event) {
@@ -23,7 +33,6 @@ function filterTodos(event) {
   listItems.forEach(function (listItem) {
     const text = listItem.textContent.toLowerCase();
     if (text.indexOf(filterValue) === -1) {
-      // Not Found
       listItem.setAttribute('style', 'display : none !important');
     } else {
       listItem.setAttribute('style', 'display : block');
