@@ -6,21 +6,10 @@ const secondCardBody = document.querySelectorAll('.card-body')[1];
 const filter = document.querySelector('#filter');
 const clearButton = document.querySelector('#clear-todos');
 
-eventListeners();
-
-
-function eventListeners() {
-  form.addEventListener('submit', addTodo);
-  document.addEventListener('DOMContentLoaded', loadAllTodosToUI);
-  secondCardBody.addEventListener('click', deleteTodo);
-  filter.addEventListener('keyup', filterTodos);
-  clearButton.addEventListener('click', clearAllTodos);
-}
-
-function addTodo(event) {
+const addTodo = event => {
   const newTodo = todoInput.value.trim();
 
-  if (uniqueTodoControl(newTodo) === true) {
+  if (uniqueTodoControl(newTodo)) {
     if (newTodo === '') {
       showAlert("danger", "Please enter a todo...");
     } else {
@@ -31,20 +20,20 @@ function addTodo(event) {
   }
 
   event.preventDefault();
-}
+};
 
-function uniqueTodoControl(todo) {
+const uniqueTodoControl = todo => {
   const todos = getTodosFromStorage();
 
   if (todos.includes(todo)) {
-    showAlert('warning', 'This todo already added...')
+    showAlert('warning', 'This todo already added...');
     return false;
   } else {
     return true;
   }
-}
+};
 
-function addTodoToUI(newTodo) {
+const addTodoToUI = newTodo => {
   const listItem = document.createElement('li');
 
   const link = document.createElement('a');
@@ -58,17 +47,17 @@ function addTodoToUI(newTodo) {
 
   todoList.appendChild(listItem);
   todoInput.value = ''
-}
+};
 
-function addTodoToStorage(newTodo) {
+const addTodoToStorage = newTodo => {
   let todos = getTodosFromStorage();
 
   todos.push(newTodo);
 
   localStorage.setItem('todos', JSON.stringify(todos));
-}
+};
 
-function getTodosFromStorage() {
+const getTodosFromStorage = () => {
   let todos;
 
   if (localStorage.getItem('todos') === null) {
@@ -78,37 +67,37 @@ function getTodosFromStorage() {
   }
 
   return todos;
-}
+};
 
-function loadAllTodosToUI() {
+const loadAllTodosToUI = () => {
   let todos = getTodosFromStorage();
 
   todos.forEach(function (todo) {
     addTodoToUI(todo);
   })
-}
+};
 
-function deleteTodo(event) {
+const deleteTodo = event => {
   if (event.target.className === 'fa fa-remove') {
     event.target.parentElement.parentElement.remove();
     deleteTodoFromStorage(event.target.parentElement.parentElement.textContent);
     showAlert('success', 'Todo deleted succesfully')
   }
-}
+};
 
-function deleteTodoFromStorage(deletetodo) {
+const deleteTodoFromStorage = deletetodo => {
   let todos = getTodosFromStorage();
 
   todos.forEach(function (todo, index) {
     if (todo === deletetodo) {
       todos.splice(index, 1);
     }
-  })
+  });
 
   localStorage.setItem('todos', JSON.stringify(todos))
-}
+};
 
-function filterTodos(event) {
+const filterTodos = event => {
   const filterValue = event.target.value.toLowerCase();
   const listItems = document.querySelectorAll('.list-group-item');
 
@@ -120,18 +109,18 @@ function filterTodos(event) {
       listItem.setAttribute('style', 'display : block');
     }
   })
-}
+};
 
-function clearAllTodos() {
+const clearAllTodos = () => {
   if (confirm('Tümünü silmek istediğinize emin misiniz?')) {
     while (todoList.firstElementChild != null) {
       todoList.removeChild(todoList.firstElementChild);
     }
     localStorage.removeItem('todos');
   }
-}
+};
 
-function showAlert(type, message) {
+const showAlert = (type, message) => {
   const alert = document.createElement('div');
   alert.className = `alert alert-${type}`;
   alert.textContent = message;
@@ -141,5 +130,14 @@ function showAlert(type, message) {
   setTimeout(function () {
     alert.remove();
   }, 1500)
-}
+};
 
+const eventListeners = () => {
+  form.addEventListener('submit', addTodo);
+  document.addEventListener('DOMContentLoaded', loadAllTodosToUI);
+  secondCardBody.addEventListener('click', deleteTodo);
+  filter.addEventListener('keyup', filterTodos);
+  clearButton.addEventListener('click', clearAllTodos);
+};
+
+eventListeners();
