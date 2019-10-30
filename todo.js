@@ -6,15 +6,43 @@ const secondCardBody = document.querySelectorAll('.card-body')[1];
 const filter = document.querySelector('#filter');
 const clearButton = document.querySelector('#clear-todos');
 
+function Todo(newTodo) {
+  newTodo = todoInput.value.trim();
+  this.todo = newTodo;
+}
+
+Todo.prototype.addTodoToUI = function () {
+  const listItem = document.createElement('li');
+
+  const link = document.createElement('a');
+  link.href = '#';
+  link.className = 'delete-item';
+  link.innerHTML = '<i class = "fa fa-remove"></i>';
+
+  listItem.className = 'list-group-item d-flex justify-content-between';
+  listItem.appendChild(document.createTextNode(this.todo));
+  listItem.appendChild(link);
+
+  todoList.appendChild(listItem);
+  todoInput.value = ''
+};
+Todo.prototype.addTodoToStorage = function () {
+  let todos = getTodosFromStorage();
+  todos.push(this.todo);
+  localStorage.setItem('todos', JSON.stringify(todos));
+};
+
 const addTodo = event => {
-  const newTodo = todoInput.value.trim();
+
+  const todoItem = new Todo();
+  const newTodo = todoItem.todo;
 
   if (uniqueTodoControl(newTodo)) {
     if (newTodo === '') {
       showAlert("danger", "Please enter a todo...");
     } else {
-      addTodoToUI(newTodo);
-      addTodoToStorage(newTodo);
+      todoItem.addTodoToUI();
+      todoItem.addTodoToStorage();
       showAlert('success', 'Todo successfully added');
     }
   }
@@ -33,30 +61,6 @@ const uniqueTodoControl = todo => {
   }
 };
 
-const addTodoToUI = newTodo => {
-  const listItem = document.createElement('li');
-
-  const link = document.createElement('a');
-  link.href = '#';
-  link.className = 'delete-item';
-  link.innerHTML = '<i class = "fa fa-remove"></i>';
-
-  listItem.className = 'list-group-item d-flex justify-content-between';
-  listItem.appendChild(document.createTextNode(newTodo));
-  listItem.appendChild(link);
-
-  todoList.appendChild(listItem);
-  todoInput.value = ''
-};
-
-const addTodoToStorage = newTodo => {
-  let todos = getTodosFromStorage();
-
-  todos.push(newTodo);
-
-  localStorage.setItem('todos', JSON.stringify(todos));
-};
-
 const getTodosFromStorage = () => {
   let todos;
 
@@ -67,6 +71,22 @@ const getTodosFromStorage = () => {
   }
 
   return todos;
+};
+
+const addTodoToUI = function (todo) {
+  const listItem = document.createElement('li');
+
+  const link = document.createElement('a');
+  link.href = '#';
+  link.className = 'delete-item';
+  link.innerHTML = '<i class = "fa fa-remove"></i>';
+
+  listItem.className = 'list-group-item d-flex justify-content-between';
+  listItem.appendChild(document.createTextNode(todo));
+  listItem.appendChild(link);
+
+  todoList.appendChild(listItem);
+  todoInput.value = ''
 };
 
 const loadAllTodosToUI = () => {
