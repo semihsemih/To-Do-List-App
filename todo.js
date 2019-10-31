@@ -6,39 +6,90 @@ const secondCardBody = document.querySelectorAll('.card-body')[1];
 const filter = document.querySelector('#filter');
 const clearButton = document.querySelector('#clear-todos');
 
-function Todo(newTodo) {
-  newTodo = todoInput.value.trim();
-  this.todo = newTodo;
+class Todo {
+  constructor() {
+    this.todo = todoInput.value.trim();
+  }
+
+  addTodoToUI() {
+    const listItem = document.createElement('li');
+
+    const link = document.createElement('a');
+    link.href = '#';
+    link.className = 'delete-item';
+    link.innerHTML = '<i class = "fa fa-remove"></i>';
+
+    listItem.className = 'list-group-item d-flex justify-content-between';
+    listItem.appendChild(document.createTextNode(this.todo));
+    listItem.appendChild(link);
+
+    todoList.appendChild(listItem);
+    todoInput.value = ''
+  }
+
+  addTodoToStorage() {
+    let todos = Todo.getTodosFromStorage();
+    todos.push(this.todo);
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }
+
+  static uniqueTodoControl  = todo => {
+    const todos = this.getTodosFromStorage();
+    if (todos.includes(todo)) {
+      showAlert('warning', 'This todo already added...');
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  static deleteTodo = event => {
+    if (event.target.className === 'fa fa-remove') {
+      event.target.parentElement.parentElement.remove();
+      this.deleteTodoFromStorage(event.target.parentElement.parentElement.textContent);
+      showAlert('success', 'Todo deleted successfully')
+    }
+  };
+
+  static deleteTodoFromStorage = deleteTodo => {
+    let todos = this.getTodosFromStorage();
+
+    todos.forEach(function (todo, index) {
+      if (todo === deleteTodo) {
+        todos.splice(index, 1);
+      }
+    });
+
+    localStorage.setItem('todos', JSON.stringify(todos))
+  }
+
+  static clearAllTodos() {
+    if (confirm('Tümünü silmek istediğinize emin misiniz?')) {
+      while (todoList.firstElementChild != null) {
+        todoList.removeChild(todoList.firstElementChild);
+      }
+      localStorage.removeItem('todos');
+    }
+  };
+
+  static getTodosFromStorage() {
+    let todos;
+
+    if (localStorage.getItem('todos') === null) {
+      todos = [];
+    } else {
+      todos = JSON.parse(localStorage.getItem('todos'));
+    }
+
+    return todos;
+  };
 }
 
-Todo.prototype.addTodoToUI = function () {
-  const listItem = document.createElement('li');
-
-  const link = document.createElement('a');
-  link.href = '#';
-  link.className = 'delete-item';
-  link.innerHTML = '<i class = "fa fa-remove"></i>';
-
-  listItem.className = 'list-group-item d-flex justify-content-between';
-  listItem.appendChild(document.createTextNode(this.todo));
-  listItem.appendChild(link);
-
-  todoList.appendChild(listItem);
-  todoInput.value = ''
-};
-Todo.prototype.addTodoToStorage = function () {
-  let todos = getTodosFromStorage();
-  todos.push(this.todo);
-  localStorage.setItem('todos', JSON.stringify(todos));
-};
-
 const addTodo = event => {
-
   const todoItem = new Todo();
-  const newTodo = todoItem.todo;
 
-  if (uniqueTodoControl(newTodo)) {
-    if (newTodo === '') {
+  if (Todo.uniqueTodoControl(todoItem.todo)) {
+    if (todoItem.todo === '') {
       showAlert("danger", "Please enter a todo...");
     } else {
       todoItem.addTodoToUI();
@@ -48,29 +99,6 @@ const addTodo = event => {
   }
 
   event.preventDefault();
-};
-
-const uniqueTodoControl = todo => {
-  const todos = getTodosFromStorage();
-
-  if (todos.includes(todo)) {
-    showAlert('warning', 'This todo already added...');
-    return false;
-  } else {
-    return true;
-  }
-};
-
-const getTodosFromStorage = () => {
-  let todos;
-
-  if (localStorage.getItem('todos') === null) {
-    todos = [];
-  } else {
-    todos = JSON.parse(localStorage.getItem('todos'));
-  }
-
-  return todos;
 };
 
 const addTodoToUI = function (todo) {
@@ -90,31 +118,11 @@ const addTodoToUI = function (todo) {
 };
 
 const loadAllTodosToUI = () => {
-  let todos = getTodosFromStorage();
+  let todos = Todo.getTodosFromStorage();
 
   todos.forEach(function (todo) {
     addTodoToUI(todo);
   })
-};
-
-const deleteTodo = event => {
-  if (event.target.className === 'fa fa-remove') {
-    event.target.parentElement.parentElement.remove();
-    deleteTodoFromStorage(event.target.parentElement.parentElement.textContent);
-    showAlert('success', 'Todo deleted succesfully')
-  }
-};
-
-const deleteTodoFromStorage = deletetodo => {
-  let todos = getTodosFromStorage();
-
-  todos.forEach(function (todo, index) {
-    if (todo === deletetodo) {
-      todos.splice(index, 1);
-    }
-  });
-
-  localStorage.setItem('todos', JSON.stringify(todos))
 };
 
 const filterTodos = event => {
@@ -129,15 +137,6 @@ const filterTodos = event => {
       listItem.setAttribute('style', 'display : block');
     }
   })
-};
-
-const clearAllTodos = () => {
-  if (confirm('Tümünü silmek istediğinize emin misiniz?')) {
-    while (todoList.firstElementChild != null) {
-      todoList.removeChild(todoList.firstElementChild);
-    }
-    localStorage.removeItem('todos');
-  }
 };
 
 const showAlert = (type, message) => {
@@ -155,9 +154,9 @@ const showAlert = (type, message) => {
 const eventListeners = () => {
   form.addEventListener('submit', addTodo);
   document.addEventListener('DOMContentLoaded', loadAllTodosToUI);
-  secondCardBody.addEventListener('click', deleteTodo);
+  secondCardBody.addEventListener('click', Todo.deleteTodo);
   filter.addEventListener('keyup', filterTodos);
-  clearButton.addEventListener('click', clearAllTodos);
+  clearButton.addEventListener('click', Todo.clearAllTodos);
 };
 
 eventListeners();
