@@ -11,7 +11,13 @@ class Todo {
     this.todo = todoInput.value.trim();
   }
 
-  addTodoToUI() {
+  addTodoToStorage() {
+    let todos = Todo.getTodosFromStorage();
+    todos.push(this.todo);
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }
+
+  static addTodoToUI = todo => {
     const listItem = document.createElement('li');
 
     const link = document.createElement('a');
@@ -20,20 +26,32 @@ class Todo {
     link.innerHTML = '<i class = "fa fa-remove"></i>';
 
     listItem.className = 'list-group-item d-flex justify-content-between';
-    listItem.appendChild(document.createTextNode(this.todo));
+    listItem.draggable = true;
+    listItem.appendChild(document.createTextNode(todo));
     listItem.appendChild(link);
 
     todoList.appendChild(listItem);
     todoInput.value = ''
+  };
+
+  static loadAllTodosToUI = () => {
+    let todos = this.getTodosFromStorage();
+
+    todos.forEach(function (todo) {
+      Todo.addTodoToUI(todo);
+    })
+  };
+
+  static reloadAllTodosToUI = () => {
+    while (todoList.firstElementChild != null) {
+      todoList.removeChild(todoList.firstElementChild);
+    }
+
+    this.loadAllTodosToUI();
+    sortTodo();
   }
 
-  addTodoToStorage() {
-    let todos = Todo.getTodosFromStorage();
-    todos.push(this.todo);
-    localStorage.setItem('todos', JSON.stringify(todos));
-  }
-
-  static uniqueTodoControl  = todo => {
+  static uniqueTodoControl = todo => {
     const todos = this.getTodosFromStorage();
     if (todos.includes(todo)) {
       showAlert('warning', 'This todo already added...');
@@ -92,37 +110,13 @@ const addTodo = event => {
     if (todoItem.todo === '') {
       showAlert("danger", "Please enter a todo...");
     } else {
-      todoItem.addTodoToUI();
+      Todo.addTodoToUI(todoItem.todo);
       todoItem.addTodoToStorage();
       showAlert('success', 'Todo successfully added');
     }
   }
 
   event.preventDefault();
-};
-
-const addTodoToUI = function (todo) {
-  const listItem = document.createElement('li');
-
-  const link = document.createElement('a');
-  link.href = '#';
-  link.className = 'delete-item';
-  link.innerHTML = '<i class = "fa fa-remove"></i>';
-
-  listItem.className = 'list-group-item d-flex justify-content-between';
-  listItem.appendChild(document.createTextNode(todo));
-  listItem.appendChild(link);
-
-  todoList.appendChild(listItem);
-  todoInput.value = ''
-};
-
-const loadAllTodosToUI = () => {
-  let todos = Todo.getTodosFromStorage();
-
-  todos.forEach(function (todo) {
-    addTodoToUI(todo);
-  })
 };
 
 const filterTodos = event => {
@@ -153,7 +147,7 @@ const showAlert = (type, message) => {
 
 const eventListeners = () => {
   form.addEventListener('submit', addTodo);
-  document.addEventListener('DOMContentLoaded', loadAllTodosToUI);
+  document.addEventListener('DOMContentLoaded', Todo.loadAllTodosToUI);
   secondCardBody.addEventListener('click', Todo.deleteTodo);
   filter.addEventListener('keyup', filterTodos);
   clearButton.addEventListener('click', Todo.clearAllTodos);

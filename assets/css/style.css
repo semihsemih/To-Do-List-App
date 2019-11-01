@@ -1,0 +1,20 @@
+.hold {
+    border: dashed #dc3545 2px;
+}
+
+.invisible {
+    display: none !important;
+}
+
+.hovered {
+    margin-bottom: 5px;
+    background: #f4f4f4;
+    border-bottom: 2px dashed #dc3545;
+}
+.list-group-item {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.3);
+    transition: box-shadow 500ms;
+}
+.list-group-item:hover {
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+}
